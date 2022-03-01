@@ -1,0 +1,11 @@
+{
+  "name": "event-notify",
+  "version": "1.0.0",
+  "description": "Server-Sent Events mechanism to notify external applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thiago Leal",
+  "license": "ISC"
+}
