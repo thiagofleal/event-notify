@@ -27,6 +27,8 @@ class Client
     start() {
         this.response.setHeader('Access-Control-Allow-Origin', '*');
         this.response.setHeader('Content-Type', 'text/event-stream');
+        this.response.setHeader('Cache-Control', 'no-cache');
+        this.response.setHeader('Connection', 'keep-alive');
     }
 
     /**
