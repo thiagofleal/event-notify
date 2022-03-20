@@ -34,6 +34,19 @@ server.post("/:id/emit", (request, response) => {
     return true;
 });
 
-server.listen(8000, () => {
-    console.log("Server started.");
+let port = 8000;
+
+const prefix = "--port=";
+const arg = process.argv.find(a => a.startsWith(prefix));
+
+if (arg) {
+    const value = parseInt(arg.replace(prefix, ""));
+
+    if (!isNaN(value)) {
+        port = value;
+    }
+}
+
+server.listen(port, () => {
+    console.log("Server started at port " + port);
 });
