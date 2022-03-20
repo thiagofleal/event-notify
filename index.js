@@ -12,7 +12,7 @@ server.get("/:id/events", (request, response) => {
     const client = new Client(response);
     client.start();
     const id = request.params.id;
-    const { data } = request.body || {};
+    const data = request.query || {};
     client.setData(data);
     const remove = manager.add(client, id);
 
@@ -22,8 +22,12 @@ server.get("/:id/events", (request, response) => {
 
 server.post("/:id/emit", (request, response) => {
     const id = request.params.id;
-    const { event, data } = request.body || {};
-    manager.notifyGroup(id, event, data);
+    const { event, data, where } = request.body || {};
+    if (where && Array.isArray(where)) {
+        manager.notifyWhere(id, where, event, data);
+    } else if (id) {
+        manager.notifyGroup(id, event, data);
+    }
     response.status(200).send({
         message: "Event sent successful"
     });
@@ -31,5 +35,5 @@ server.post("/:id/emit", (request, response) => {
 });
 
 server.listen(8000, () => {
-    console.log("Servidor iniciado.");
+    console.log("Server started.");
 });

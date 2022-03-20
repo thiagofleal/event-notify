@@ -17,9 +17,7 @@ class Client
      */
     setData(data) {
         if (typeof data === "object") {
-            this.data = JSON.stringify(data);
-        } else {
-            this.data = data;
+            this.data = Object.assign({}, { ...data });
         }
     }
 
@@ -27,6 +25,7 @@ class Client
      * Starts the response
      */
     start() {
+        this.response.setHeader('Access-Control-Allow-Origin', '*');
         this.response.setHeader('Content-Type', 'text/event-stream');
     }
 

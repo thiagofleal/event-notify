@@ -1,5 +1,31 @@
 var Client = require("./client");
 
+function evaluateCondition(where, args) {
+    if (where.length !== 3) {
+        return false;
+    }
+    switch (where[1]) {
+        case "==":
+            return args && args[where[0]] && args[where[0]] == where[2];
+        case "!=":
+            return args && args[where[0]] && args[where[0]] != where[2];
+        case ">":
+            return args && args[where[0]] && args[where[0]] > where[2];
+        case "<":
+            return args && args[where[0]] && args[where[0]] < where[2];
+        case  ">=":
+            return args && args[where[0]] && args[where[0]] >= where[2];
+        case "<=":
+            return args && args[where[0]] && args[where[0]] <= where[2];
+        case "IN":
+            return args && args[where[0]] && where[2].includes(args[where[0]]);
+        case "AND":
+            return evaluateCondition(where[0], args) && evaluateCondition(where[2], args);
+        case "OR":
+            return evaluateCondition(where[0], args) || evaluateCondition(where[2], args);
+    }
+}
+
 class ClientsManager
 {
     constructor() {
@@ -74,6 +100,19 @@ class ClientsManager
         this.clients.filter(c => c.id == id).forEach(c => {
             this.notifyClient(c.client, event, data);
         });
+    }
+
+    /**
+     * Notify clients that matches the conditions
+     * @param {string} id Id of group to notify
+     * @param {Array<any>} where Conditions to match
+     * @param {strin} event Event name
+     * @param {any?} data Data to sent
+     */
+    notifyWhere(id, where, event, data) {
+        this.clients.filter(c => c.id == id && evaluateCondition(where, c.client.data)).forEach(c => {
+            this.notifyClient(c.client, event, data)
+        })
     }
 }
 
