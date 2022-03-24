@@ -25,10 +25,12 @@ class Client
      * Starts the response
      */
     start() {
-        this.response.setHeader('Access-Control-Allow-Origin', '*');
-        this.response.setHeader('Content-Type', 'text/event-stream');
-        this.response.setHeader('Cache-Control', 'no-cache');
-        this.response.setHeader('Connection', 'keep-alive');
+        this.response.writeHead(200, {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        });
     }
 
     /**
