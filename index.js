@@ -16,8 +16,8 @@ server.get("/:id/events", (request, response) => {
     client.setData(data);
     const remove = manager.add(client, id);
 
-    request.on("close", remove);
-    request.on("end", remove);
+    request.on("close", () => remove());
+    request.on("end", () => remove());
 });
 
 server.post("/:id/emit", (request, response) => {
