@@ -39,10 +39,11 @@ class ClientsManager
      * @returns Callback to remove the client
      */
     add(client, id) {
-        const i = this.clients.push({ client, id });
+        const value = { client, id };
+        this.clients.push(value);
         return () => {
-            const index = this.clients.findIndex(i => i.client === client && i.id === id);
-            this.remove(index);
+            const index = this.clients.indexOf(value);
+            index !== -1 ? this.remove(index) : undefined;
         }
     }
 
