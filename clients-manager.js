@@ -1,6 +1,9 @@
 var Client = require("./client");
 
 function evaluateCondition(where, args) {
+    if (typeof where === "string") {
+        where = where.split(" ");
+    }
     if (where.length !== 3) {
         return false;
     }
