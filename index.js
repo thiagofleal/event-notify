@@ -1,6 +1,8 @@
 var express = require("express");
 var cors = require("cors");
+var fs = require("fs");
 var bodyParser = require("body-parser");
+
 var Client = require("./client");
 var ClientsManager = require("./clients-manager");
 var Generator = require("./generator");
@@ -8,14 +10,14 @@ var Generator = require("./generator");
 var server = express();
 var manager = new ClientsManager();
 
-const clients = [];
+const clients = {};
 
 server.use(bodyParser.json());
 server.use(cors());
 
 server.get("/:id/events", (request, response) => {
     const id = request.params.id.trim();
-    const item = clients.find(c => c.id === id);
+    const item = clients[id];
 
     if (item) {
         const data = request.query || {};
@@ -43,7 +45,7 @@ server.get("/:id/events", (request, response) => {
 
 server.post("/:id/emit", (request, response) => {
     const id = request.params.id.trim();
-    const client = clients.find(c => c.id === id);
+    const client = clients[id];
 
     if (client) {
         const { authorization } = request.headers;
@@ -80,15 +82,66 @@ server.post("/", (request, response) => {
     if (id) {
         client.id = id;
     }
-    while (!client.id || clients.find(c => c.id === client.id)) {
+    while (!client.id || clients[id]) {
         client.id = Generator.randomString(12);
     }
     client.public = Generator.randomString(20);
     client.private = Generator.randomString(20);
-    
+
     response.status(200).send(client);
-    clients.push(client);
-    
+    clients[id] = client;
+
+    return true;
+});
+
+const filename = "clients.json";
+
+function load() {
+    const ret = [];
+
+    if (fs.existsSync(filename)) {
+        const content = fs.readFileSync(filename);
+        const json = JSON.parse(content);
+
+        for (const key in json) {
+            clients[key] = json[key];
+            ret.push(key);
+        }
+    }
+    return ret;
+}
+
+server.post("/load", (request, response) => {
+    const ret = load();
+    response.status(200).send({
+        count: ret.length,
+        clients: ret
+    });
+    return true;
+});
+
+server.post("/persist", (request, response) => {
+    const ids = request.body.ids || [];
+    const content = {};
+    const ret = [];
+
+    if (!Array.isArray(ids)) {
+        response.status(400).send({
+            error: "Param \"ids\" must be array"
+        });
+        return false;
+    }
+    for (const id of ids) {
+        if (clients[id]) {
+            content[id] = clients[id];
+            ret.push(id);
+        }
+    }
+    fs.writeFileSync(filename, JSON.stringify(content));
+    response.status(200).send({
+        count: ret.length,
+        clients: ret
+    });
     return true;
 });
 
@@ -106,5 +159,8 @@ if (arg) {
 }
 
 server.listen(port, () => {
+    const ret = load();
+
     console.log("Server started at port " + port);
+    console.log("Load: ", ret);
 });
