@@ -12,24 +12,23 @@ function evaluateCondition(where, args) {
     }
     let field = args[where[0]];
 
-    if (field === undefined) {
-        field = null;
-    }
     switch (where[1]) {
         case "==":
-            return field ? field == where[2] : field === where[2];
+            return (field === undefined && where[2] === null) || field == where[2];
         case "!=":
-            return field ? field != where[2] : field !== where[2];
+            return (field === undefined && where[2] !== null) || field != where[2];
         case ">":
-            return field > where[2];
+            return +field > +where[2];
         case "<":
-            return field < where[2];
-        case  ">=":
-            return field >= where[2];
+            return +field < +where[2];
+        case ">=":
+            return +field >= +where[2];
         case "<=":
-            return field <= where[2];
+            return +field <= +where[2];
         case "IN":
-            return where[2].includes(field);
+            return Array.isArray(where[2]) && where[2].includes(field);
+        case "NOT IN":
+            return Array.isArray(where[2]) && !where[2].includes(field);
         case "AND":
             return evaluateCondition(where[0], args) && evaluateCondition(where[2], args);
         case "OR":
