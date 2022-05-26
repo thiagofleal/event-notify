@@ -7,21 +7,29 @@ function evaluateCondition(where, args) {
     if (where.length !== 3) {
         return false;
     }
+    if (typeof args !== "object") {
+        args = {};
+    }
+    let field = args[where[0]];
+
+    if (field === undefined) {
+        field = null;
+    }
     switch (where[1]) {
         case "==":
-            return args && args[where[0]] && args[where[0]] == where[2];
+            return field ? field == where[2] : field === where[2];
         case "!=":
-            return args && args[where[0]] && args[where[0]] != where[2];
+            return field ? field != where[2] : field !== where[2];
         case ">":
-            return args && args[where[0]] && args[where[0]] > where[2];
+            return field > where[2];
         case "<":
-            return args && args[where[0]] && args[where[0]] < where[2];
+            return field < where[2];
         case  ">=":
-            return args && args[where[0]] && args[where[0]] >= where[2];
+            return field >= where[2];
         case "<=":
-            return args && args[where[0]] && args[where[0]] <= where[2];
+            return field <= where[2];
         case "IN":
-            return args && args[where[0]] && where[2].includes(args[where[0]]);
+            return where[2].includes(field);
         case "AND":
             return evaluateCondition(where[0], args) && evaluateCondition(where[2], args);
         case "OR":
