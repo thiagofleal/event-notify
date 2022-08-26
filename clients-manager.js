@@ -26,9 +26,9 @@ function evaluateCondition(where, args) {
         case "<=":
             return +field <= +where[2];
         case "IN":
-            return Array.isArray(where[2]) && where[2].map(v => "" + v).includes(field);
+            return Array.isArray(where[2]) && where[2].map(v => `${v}`).includes(field);
         case "NOT IN":
-            return Array.isArray(where[2]) && !where[2].map(v => "" + v).includes(field);
+            return Array.isArray(where[2]) && !where[2].map(v => `${v}`).includes(field);
         case "AND":
             return evaluateCondition(where[0], args) && evaluateCondition(where[2], args);
         case "OR":
